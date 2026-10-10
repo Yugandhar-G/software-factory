@@ -28,6 +28,13 @@ to it on that machine.
 
 ## Use in a project
 
+0. `/factory onboard` builds the project's AGENTS.md around the factory: the
+   plugin inserts and maintains a workflow block (each step and the skill behind
+   it, the agent rules, a skills table minus the ones `.factory/config.json`
+   `skills_off` rules out), the onboarder agent drafts the project's own facts
+   for the user to approve, and `.factory/profile.md` is generated from the
+   AGENTS.md "## Factory profile" section. `bin/factory onboard --check` fails
+   when either is out of date; `--write` refreshes them and touches nothing else.
 1. `/factory` once in the project, or run `bin/factory init`: writes
    `.factory/profile.md` from the template and gitignores job state and
    worktrees. It never overwrites.
@@ -43,7 +50,8 @@ to it on that machine.
 3. Optional `.factory/config.json`:
 
    ```json
-   { "branch_prefix": "factory/", "worktrees_dir": ".worktrees", "state_dir": ".factory" }
+   { "branch_prefix": "factory/", "worktrees_dir": ".worktrees", "state_dir": ".factory",
+     "skills_off": { "greploop": "no third-party review of this code" } }
    ```
 
 4. `/factory <feature, in your words>`.
@@ -54,11 +62,12 @@ to it on that machine.
 | --- | --- |
 | `skills/factory`, `skills/review-loop` | The orchestrator workflow and review rules |
 | `skills/new-feature`, `code-structure`, `evidence-driven-testing`, `before-and-after`, `greploop`, `greploop-apps`, `unslop` | Vendored upstream skills pinned in `upstream-manifest.json`; byte-identical except the recorded before-and-after privacy patch (screenshots go to a secret gist by default). A project's profile can rule a skill out, as Pūrva rules out greploop |
-| `agents/` | spec-writer, builder, five reviewers (code, security, ux, ui, data), approver, observer (Opus 5.5). Invoked as `factory:<role>` |
+| `agents/` | spec-writer, builder, five reviewers (code, security, ux, ui, data), approver, observer (Opus 5.5), onboarder. Invoked as `factory:<role>` |
 | `hooks/hooks.json` | PreToolUse work-loss guard on every Bash call in every project where the plugin is enabled (it blocks bulk `rm -r` of non-scratch paths and history-discarding git commands; enable the plugin per project if that is too broad) |
 | `factory/scripts/` | `state.py` (job state and gates), `guard.py` (removal audit), `destructive_guard.py` (the hook), `serve.py` (loopback dashboard), `home.py` (project, config, profile, state location) |
 | `factory/harness/` | The same graph in code on the Claude Agent SDK, with each role's tool policy enforced on every tool call |
 | `factory/codex.py` | Generates the Codex form for a project |
+| `factory/onboard.py`, `templates/agents-workflow.md` | The AGENTS.md workflow block and the profile generated from AGENTS.md |
 | `bin/factory` | CLI for all of the above |
 | `templates/profile.md` | Starting profile |
 

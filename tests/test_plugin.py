@@ -18,7 +18,7 @@ from factory.harness.agents import load as load_agents  # noqa: E402
 from factory.scripts import home  # noqa: E402
 
 CLI = REPO / 'bin' / 'factory'
-ROLES = {'spec-writer', 'builder', 'observer', 'approver', 'reviewer-code', 'reviewer-security',
+ROLES = {'spec-writer', 'builder', 'observer', 'approver', 'onboarder', 'reviewer-code', 'reviewer-security',
          'reviewer-ux', 'reviewer-ui', 'reviewer-data'}
 UPSTREAM = json.loads((REPO / 'upstream-manifest.json').read_text())
 

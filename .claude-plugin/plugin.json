@@ -1,7 +1,7 @@
 {
   "name": "factory",
   "displayName": "Software factory",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Spec, isolated build, evidence, independent reviewers, an isolated observer and a removal audit for feature delivery in any repository. Project rules come from the project's .factory/profile.md.",
   "author": { "name": "Yugandhar Gopu" },
   "keywords": ["workflow", "review", "agents", "delivery", "harness"]

@@ -1,19 +1,53 @@
 ---
 name: factory
-description: Run or resume feature delivery in the current project with a spec, isolated build, evidence, independent review and an isolated observer. Use for /factory <feature>, resume, status, rework, approve or next.
+description: Run or resume feature delivery in the current project with a spec, isolated build, evidence, independent review and an isolated observer, and onboard a project so its AGENTS.md and profile are built around the factory's skills. Use for /factory <feature>, onboard, resume, status, rework, approve or next.
 ---
 # Software factory
 
-Use /factory <feature>, /factory resume <job-id>, /factory status <job-id>, or
-/factory rework <job-id> <feedback>. This is an on-demand workflow, not a daemon.
+Use /factory <feature>, /factory onboard, /factory resume <job-id>,
+/factory status <job-id>, or /factory rework <job-id> <feedback>. This is an on-demand workflow, not a daemon.
 
 `FACTORY` below means `"${CLAUDE_PLUGIN_ROOT}/bin/factory"`; run it from the
 project's main checkout. Job state lives in the project (`.factory/jobs` by
 default), never in the plugin.
 
+## Onboard a project (`/factory onboard`)
+
+AGENTS.md is structured around the factory: a workflow block the plugin owns
+(the steps, the skill behind each step, the agent rules, the skills table) and
+the project's own sections, including "## Factory profile" with `### All roles`
+and one `### <role>` subsection per role. `.factory/profile.md` is generated
+from that section, so the rules live in one place, where people read them.
+
+1. Claim a job (`FACTORY state new "onboard: <the user's words>"`) and isolate it
+   with ../new-feature/SKILL.md, branch `<prefix>onboard-<suffix>`. AGENTS.md,
+   the architecture doc and the profile are rules agents work under: never edit
+   them on the main checkout.
+2. Run `FACTORY onboard` (dry run) in the worktree to see what the plugin would
+   generate. Ask the user which skills to rule out for this project and why;
+   record them in `.factory/config.json` as `"skills_off": {"<skill>": "<why>"}`.
+3. Have `factory:onboarder` read the repository and write drafts into the job
+   folder: the project sections of AGENTS.md with a source for every fact, a
+   "## Factory profile" section, an architecture skeleton only if the project
+   has none, and the questions only the user can answer.
+4. Show the user the drafts and the questions. Nothing is applied until they
+   approve; apply their answers, not your guesses.
+5. Apply the approved text to AGENTS.md (and the architecture doc) in the
+   worktree, then `FACTORY onboard --write` to insert or refresh the workflow
+   block and generate the profile. `FACTORY onboard --check` must then pass.
+6. Run the project's checks, then the usual review loop, observer and approver,
+   and open a pull request. The user merges.
+
+Refreshing later (after a plugin update, or after editing the Factory profile
+section) is steps 1, 5 and 6 only: `FACTORY onboard --write` rewrites the block
+and the profile and touches nothing else. A project with a hand-written
+`.factory/profile.md` keeps it until the user asks to move its rules into
+AGENTS.md (`--force` replaces it).
+
 ## First use in a project
 
-If `.factory/profile.md` is missing, run `FACTORY init`. It writes a profile
+If the project has no AGENTS.md workflow block yet, offer `/factory onboard`
+first. If `.factory/profile.md` is missing, run `FACTORY init`. It writes a profile
 template and gitignores job state and worktrees; it never overwrites. Then fill
 the profile with the user from what the repository actually says (CLAUDE.md,
 AGENTS.md, tests, CI): the "All roles" rules, verification commands, forbidden
