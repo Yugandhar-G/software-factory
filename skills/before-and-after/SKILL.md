@@ -26,9 +26,10 @@ allowed-tools:
 **DO NOT:**
 - Switch git branches, stash changes, start dev servers, or assume what "before" is
 - Use `--full` unless user explicitly asks for full page / full scroll capture
+- Pass `--markdown` to the CLI without `--upload-url`: the CLI's own default host is public 0x0.st (local patch)
 
 **DO:**
-- Use `--markdown` when user wants PR integration or markdown output
+- For PR integration, capture without `--markdown`, then upload with `./scripts/upload-and-copy.sh --markdown`, which defaults to a secret gist (local patch)
 - Use `--mobile` / `--tablet` if user mentions phone, mobile, tablet, responsive, etc.
 - Assume current state is **After**
 - If user provides only one URL or says "PR screenshots" without URLs, **ASK**: "What URL should I use for the 'before' state? (production URL, preview deployment, or another local port)"
@@ -81,11 +82,11 @@ npx @vercel/before-and-after url1 url2
 ## Image Upload
 
 ```bash
-# Default (0x0.st - no signup needed)
+# Default: secret (unlisted) GitHub gist via gh (local patch; upstream default is public 0x0.st)
 ./scripts/upload-and-copy.sh before.png after.png --markdown
 
-# GitHub Gist
-IMAGE_ADAPTER=gist ./scripts/upload-and-copy.sh before.png after.png --markdown
+# Public 0x0.st, only for screens with nothing private on them, and only when the user asks
+IMAGE_ADAPTER=0x0st ./scripts/upload-and-copy.sh before.png after.png --markdown
 ```
 
 ## Vercel Deployment Protection

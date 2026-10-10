@@ -1,8 +1,11 @@
 # Third-party skills
 
-Vendored unchanged from https://github.com/michaelshimeles/skills at commit
+Vendored from https://github.com/michaelshimeles/skills at commit
 4b72f46b045e6fef52e6a98d4c162dd309826aed. `upstream-manifest.json` records the
-SHA-256 of every file, and `tests/test_plugin.py` fails if any of them drifts.
+SHA-256 of every upstream file, and `tests/test_plugin.py` fails if any of them
+drifts. One local patch, listed under `local_patches` in the same manifest with
+its reason and `skills/before-and-after/LOCAL_PATCHES.md`: screenshots upload to
+a secret gist by default instead of the public 0x0.st host.
 
 | Skill | Origin | License |
 | --- | --- | --- |

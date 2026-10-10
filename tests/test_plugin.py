@@ -91,8 +91,31 @@ class NeutralityTests(unittest.TestCase):
         self.assertNotRegex(text, r'python3 factory/scripts')
 
     def test_vendored_skills_are_byte_identical_to_the_pinned_upstream(self):
+        patched = UPSTREAM.get('local_patches', {})
         for path, digest in UPSTREAM['files'].items():
+            if path in patched:
+                continue
             self.assertEqual(hashlib.sha256((REPO / path).read_bytes()).hexdigest(), digest, path)
+
+    def test_local_patches_are_recorded_and_differ_from_upstream(self):
+        patched = UPSTREAM.get('local_patches', {})
+        self.assertTrue(patched, 'expected the before-and-after privacy patch')
+        for path, entry in patched.items():
+            self.assertIn(path, UPSTREAM['files'], path)
+            self.assertNotEqual(entry['sha256'], UPSTREAM['files'][path], path)
+            self.assertEqual(hashlib.sha256((REPO / path).read_bytes()).hexdigest(), entry['sha256'], path)
+            self.assertTrue(entry['why'].strip(), path)
+            notes = REPO / Path(path).parts[0] / Path(path).parts[1] / 'LOCAL_PATCHES.md'
+            self.assertTrue(notes.is_file(), notes)
+
+    def test_screenshots_are_never_public_by_default(self):
+        root = REPO / 'skills' / 'before-and-after' / 'scripts'
+        upload = (root / 'upload-and-copy.sh').read_text()
+        self.assertIn('IMAGE_ADAPTER="${IMAGE_ADAPTER:-gist}"', upload)
+        creates = [line for line in (root / 'adapters' / 'gist.sh').read_text().splitlines()
+                   if 'gh gist create' in line and not line.lstrip().startswith('#')]
+        self.assertTrue(creates)
+        self.assertTrue(all('--public' not in line for line in creates), creates)
 
 
 class HomeTests(unittest.TestCase):
