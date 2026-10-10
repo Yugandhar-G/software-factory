@@ -53,7 +53,7 @@ to it on that machine.
 | Path | What it is |
 | --- | --- |
 | `skills/factory`, `skills/review-loop` | The orchestrator workflow and review rules |
-| `skills/new-feature`, `code-structure`, `evidence-driven-testing`, `before-and-after`, `greploop`, `greploop-apps`, `unslop` | Vendored upstream skills, byte-identical to the pinned commit in `upstream-manifest.json` |
+| `skills/new-feature`, `code-structure`, `evidence-driven-testing`, `before-and-after`, `greploop`, `greploop-apps`, `unslop` | Vendored upstream skills pinned in `upstream-manifest.json`; byte-identical except the recorded before-and-after privacy patch (screenshots go to a secret gist by default). A project's profile can rule a skill out, as Pūrva rules out greploop |
 | `agents/` | spec-writer, builder, five reviewers (code, security, ux, ui, data), approver, observer (Opus 5.5). Invoked as `factory:<role>` |
 | `hooks/hooks.json` | PreToolUse work-loss guard on every Bash call in every project where the plugin is enabled (it blocks bulk `rm -r` of non-scratch paths and history-discarding git commands; enable the plugin per project if that is too broad) |
 | `factory/scripts/` | `state.py` (job state and gates), `guard.py` (removal audit), `destructive_guard.py` (the hook), `serve.py` (loopback dashboard), `home.py` (project, config, profile, state location) |

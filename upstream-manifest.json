@@ -23,5 +23,19 @@
     "skills/greploop-apps/references/gitlab-api.md": "202c1b98745d42df914412fa16b4bfd942c5b298ec7a4302cf57696df90da7d1",
     "skills/unslop/LICENSE": "bc957ca6bee02792566a1a028d105e02e247c6e77cf057061674273da77b200e",
     "skills/unslop/SKILL.md": "c861ee8c94debe24e28fe3f7d567883ed95ad9741fb8a4227fe217db8667fa78"
+  },
+  "local_patches": {
+    "skills/before-and-after/SKILL.md": {
+      "sha256": "3d6ad509aa91a076ab87c4e69f0ec0a956c322eb4650e8a117753255682c71a0",
+      "why": "Never pass --markdown to the CLI without --upload-url; upload through the script, which defaults to a secret gist."
+    },
+    "skills/before-and-after/scripts/upload-and-copy.sh": {
+      "sha256": "9bee6f1ce58938cdc44e213dedba656868a274a24acb814de60b1795aca4763e",
+      "why": "Default IMAGE_ADAPTER is gist, not the public 0x0.st host."
+    },
+    "skills/before-and-after/scripts/adapters/gist.sh": {
+      "sha256": "6fcaf78add9d22432ea10a880e304e62f4b3f4d9145de439ed78d08446d05f36",
+      "why": "Creates secret (unlisted) gists instead of public ones."
+    }
   }
 }

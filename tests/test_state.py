@@ -188,14 +188,18 @@ class DestructiveHookTests(unittest.TestCase):
         return subprocess.run([sys.executable,str(HOOK)],input=event,capture_output=True,text=True).returncode
     def test_blocks_destructive_git(self):
         for command in ['git reset --hard HEAD~1','git clean -fd','git checkout -- .','git push --force',
-                        'git branch -D codex/x','git stash drop','git restore big.py']:
+                        'git branch -D codex/x','git stash drop','git restore big.py',
+                        'git -C . reset --hard','git -c core.pager=cat clean -fd',
+                        'git --git-dir=.git --work-tree=. checkout -- .','git --no-pager restore big.py',
+                        'git -C src push -f origin x']:
             self.assertEqual(self.hook('Bash',{'command':command}),2,command)
     def test_blocks_bulk_removal(self):
         self.assertEqual(self.hook('Bash',{'command':'ls && rm -rf src'}),2)
         self.assertEqual(self.hook('Bash',{'command':'find . -name "*.py" -delete'}),2)
     def test_allows_deliberate_deletion_and_ordinary_work(self):
         for command in ['rm big.py','git rm big.py','git status','git diff --stat','git checkout -b codex/new',
-                        'git restore --staged big.py','rm -rf /tmp/scratch-dir','python3 tests/test_x.py']:
+                        'git restore --staged big.py','rm -rf /tmp/scratch-dir','python3 tests/test_x.py',
+                        'git -C . status','git -C src log --oneline']:
             self.assertEqual(self.hook('Bash',{'command':command}),0,command)
     def test_ignores_file_writes(self):
         self.assertEqual(self.hook('Write',{'file_path':'big.py','content':'x = 1\n'}),0)

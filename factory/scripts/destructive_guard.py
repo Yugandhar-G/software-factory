@@ -28,6 +28,17 @@ GIT_RULES = [
     (r'\bgit\s+update-ref\s+-d\b', 'deleting a ref'),
 ]
 
+GIT_GLOBALS = re.compile(
+    r'\bgit((?:\s+(?:-C|-c)\s+\S+'
+    r'|\s+--(?:git-dir|work-tree|namespace|exec-path|config-env)(?:=\S+|\s+\S+)'
+    r'|\s+(?:--no-pager|--paginate|-p|-P|--bare|--literal-pathspecs|--no-replace-objects))*)(?=\s)')
+
+
+def without_git_globals(command):
+    """`git -C dir reset --hard` -> `git reset --hard`, so the rules see the subcommand."""
+    return GIT_GLOBALS.sub('git', command)
+
+
 def block(reason):
     print(f'Blocked by factory work-loss guard: {reason}. Delete specific files or code '
           'instead and record why in the job\'s removals.md.', file=sys.stderr)
@@ -47,8 +58,9 @@ def tracked(target, cwd):
     return result.returncode == 0
 
 def check_bash(command, cwd):
+    normalized = without_git_globals(command)
     for pattern, reason in GIT_RULES:
-        if re.search(pattern, command):
+        if re.search(pattern, normalized):
             block(reason)
     for segment in re.split(r'&&|\|\||;|\||\n', command):
         try:

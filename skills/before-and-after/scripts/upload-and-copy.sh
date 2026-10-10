@@ -6,7 +6,7 @@
 #   --markdown    Generate PR markdown table and copy to clipboard
 #
 # Environment:
-#   IMAGE_ADAPTER    Storage adapter to use (default: 0x0st)
+#   IMAGE_ADAPTER    Storage adapter to use (default: gist, secret)
 #                    Available: 0x0st, gist, blob
 #
 # Adapter-specific environment variables:
@@ -23,7 +23,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ADAPTERS_DIR="$SCRIPT_DIR/adapters"
 
 # Default adapter
-IMAGE_ADAPTER="${IMAGE_ADAPTER:-0x0st}"
+IMAGE_ADAPTER="${IMAGE_ADAPTER:-gist}"
 
 BEFORE_FILE="$1"
 AFTER_FILE="$2"
@@ -50,7 +50,7 @@ if [[ -z "$BEFORE_FILE" || -z "$AFTER_FILE" ]]; then
     echo "Usage: $0 <before.png> <after.png> [--markdown]"
     echo ""
     echo "Environment:"
-    echo "  IMAGE_ADAPTER    Storage adapter (default: 0x0st)"
+    echo "  IMAGE_ADAPTER    Storage adapter (default: gist, secret)"
     echo "                   Available: 0x0st, gist, blob"
     exit 1
 fi
