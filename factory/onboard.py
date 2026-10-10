@@ -71,6 +71,8 @@ def skill_descriptions():
             first, rest = match.group(1).strip(), match.group(2)
             text = ' '.join(line.strip() for line in rest.splitlines()) if first in {'>', '|', '>-', '|-'} \
                 else ' '.join([first, *(line.strip() for line in rest.splitlines())])
+        # Upstream descriptions may carry dashes; many projects ban them in docs, so use commas.
+        text = re.sub(r'\s*[\u2014\u2013]\s*', ', ', text)
         sentence = re.split(r'(?<=[.!?])\s', text.strip(), maxsplit=1)[0]
         if len(sentence) > DESCRIPTION_LIMIT:
             sentence = sentence[:DESCRIPTION_LIMIT].rsplit(' ', 1)[0] + '...'

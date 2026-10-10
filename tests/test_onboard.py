@@ -110,6 +110,12 @@ class OnboardTests(unittest.TestCase):
         for skill in sorted(p.name for p in (REPO / 'skills').iterdir() if p.is_dir()):
             self.assertIn(f'`{skill}`', text, skill)
 
+    def test_the_block_carries_no_em_dash_even_when_a_skill_description_has_one(self):
+        onboard.run(self.project, write=True)
+        block = self.agents().split(onboard.BEGIN)[1].split(onboard.END)[0]
+        self.assertNotIn('\u2014', block)
+        self.assertNotIn('\u2013', block)
+
     def test_ruled_out_skills_are_listed_with_their_reason_and_not_as_steps(self):
         (self.project / '.factory').mkdir()
         (self.project / '.factory' / 'config.json').write_text(
