@@ -1,0 +1,12 @@
+{
+  "name": "claude-factory",
+  "owner": { "name": "Yugandhar Gopu" },
+  "description": "The software factory plugin.",
+  "plugins": [
+    {
+      "name": "factory",
+      "source": "./",
+      "description": "Spec, isolated build, evidence, independent review and an isolated observer for feature delivery."
+    }
+  ]
+}

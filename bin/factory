@@ -1,0 +1,59 @@
+#!/usr/bin/env bash
+# Software factory CLI: harness, job state, removal audit, dashboard, Codex install.
+# Code lives in this plugin; state lives in the project you run it from.
+# python -P keeps the current directory off sys.path, so a project's own factory/
+# package can never shadow the plugin's.
+set -euo pipefail
+
+PLUGIN="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+VENV="${FACTORY_VENV:-$HOME/.factory/venv}"
+export PYTHONPATH="$PLUGIN${PYTHONPATH:+:$PYTHONPATH}"
+
+usage() {
+  cat <<'USAGE'
+usage: factory <command> [args]
+
+  init                      give this project a .factory/profile.md and gitignore entries
+  run "<task, verbatim>"    run the full graph on the Claude Agent SDK (needs setup)
+  resume <job> | status <job>
+  state <args>              job state helper (new, list, show, bind, stage, round, check, ready, delivered)
+  guard <job> --head <sha>  removal audit
+  serve [--port 8765]       local dashboard of saved jobs (loopback only)
+  codex install <project>   generate Codex skills, agents and hook for a project
+  setup                     one-time: install claude-agent-sdk into $FACTORY_VENV (default ~/.factory/venv)
+  test                      run the plugin's offline test suites
+USAGE
+}
+
+command="${1:-help}"
+[ $# -gt 0 ] && shift
+
+case "$command" in
+  setup)
+    python3 -m venv "$VENV"
+    "$VENV/bin/pip" install -q -r "$PLUGIN/factory/requirements.txt"
+    echo "harness ready: $VENV"
+    ;;
+  run|resume)
+    if [ ! -x "$VENV/bin/python" ]; then
+      echo "claude-agent-sdk is not installed. Run: $PLUGIN/bin/factory setup" >&2
+      exit 1
+    fi
+    exec "$VENV/bin/python" -P -m factory.harness "$command" "$@"
+    ;;
+  status|init) exec python3 -P -m factory.harness "$command" "$@" ;;
+  state)  exec python3 "$PLUGIN/factory/scripts/state.py" "$@" ;;
+  guard)  exec python3 "$PLUGIN/factory/scripts/guard.py" "$@" ;;
+  serve)  exec python3 "$PLUGIN/factory/scripts/serve.py" "$@" ;;
+  codex)  exec python3 "$PLUGIN/factory/codex.py" "$@" ;;
+  test)
+    status=0
+    for suite in "$PLUGIN"/tests/test_*.py; do
+      echo "== $(basename "$suite")"
+      python3 "$suite" || status=1
+    done
+    exit $status
+    ;;
+  help|-h|--help) usage ;;
+  *) usage >&2; exit 2 ;;
+esac

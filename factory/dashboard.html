@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Software factory</title>
+<style>
+:root{font:16px system-ui;color:#202b28;background:#f4f6f2}body{margin:0;padding:32px}h1{font-size:28px}#status{color:#42564f}#board{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}section{background:white;border:1px solid #cbd6cd;border-radius:12px;padding:16px}h2{font-size:18px}article{border-top:1px solid #ddd;padding:12px 0;overflow-wrap:anywhere}a{color:#07594b}small{display:block;margin:8px 0}.blocked{color:#932500}.reviews{font-size:14px;line-height:1.8}button{font:inherit;padding:8px 16px;cursor:pointer}
+</style>
+<h1>Software factory</h1><p>Feature → spec → build → proof → review → approval → delivery</p>
+<button id="refresh">Refresh</button><p id="status" role="status">Loading saved jobs…</p><main id="board"></main>
+<script>
+const stages=['spec','build','review','approve','ready','blocked','delivered'];
+function el(tag,text,parent){const n=document.createElement(tag);n.textContent=text;if(parent)parent.append(n);return n}
+function reviewSummary(job){const reviews=job.reviews||{};const assigned=Array.isArray(job.assigned)?job.assigned:[];const names=[...new Set([...assigned,...Object.keys(reviews)])];return names.map(name=>name+': '+(Object.hasOwn(reviews,name)?reviews[name]:'pending')).join(' · ')||'No reviews recorded'}
+async function refresh(){try{const response=await fetch('/api/jobs',{cache:'no-store'});if(!response.ok)throw Error('HTTP '+response.status);const jobs=await response.json();const board=document.getElementById('board');board.replaceChildren();for(const stage of stages){const lane=el('section','',board);el('h2',stage,lane);for(const job of jobs.filter(j=>j.stage===stage)){const card=el('article','',lane);el('strong',job.feature||job.id,card);el('small',job.id+' · round '+(job.round||0),card);el('div',reviewSummary(job),card).className='reviews';if(job.blocker)el('p',job.blocker,card).className='blocked';if(/^[a-z0-9][a-z0-9-]{0,100}$/.test(job.id)){const link=el('a','Open artifacts',card);link.href='/jobs/'+encodeURIComponent(job.id)+'/'}if(job.updated_at)el('small',job.updated_at,card)}}document.getElementById('status').textContent=jobs.length?jobs.length+' saved jobs. Last refreshed '+new Date().toLocaleTimeString():'No jobs yet. Run /factory <feature> to begin.'}catch(error){document.getElementById('status').textContent='Unable to load jobs: '+error.message}}
+document.getElementById('refresh').addEventListener('click',refresh);refresh();setInterval(refresh,5000);
+</script></html>
