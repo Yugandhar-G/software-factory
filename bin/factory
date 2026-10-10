@@ -36,6 +36,7 @@ usage: factory <command> [args]
   guard <job> --head <sha>  removal audit
   serve [--port 8765]       local dashboard of saved jobs (loopback only)
   codex install <project>   generate Codex skills, agents and hook for a project
+  onboard [--write|--check] refresh the AGENTS.md workflow block and the profile it holds
   setup                     one-time: install claude-agent-sdk into $FACTORY_VENV (default ~/.factory/venv)
   test                      run the plugin's offline test suites
 USAGE
@@ -63,6 +64,7 @@ case "$command" in
   guard)  exec "$PY" "$PLUGIN/factory/scripts/guard.py" "$@" ;;
   serve)  exec "$PY" "$PLUGIN/factory/scripts/serve.py" "$@" ;;
   codex)  exec "$PY" "$PLUGIN/factory/codex.py" "$@" ;;
+  onboard) exec "$PY" -P "$PLUGIN/factory/onboard.py" "$@" ;;
   test)
     status=0
     for suite in "$PLUGIN"/tests/test_*.py; do

@@ -12,8 +12,9 @@ import re
 import subprocess
 
 PLUGIN = Path(__file__).resolve().parents[2]
-DEFAULTS = {'state_dir': '.factory', 'branch_prefix': 'factory/', 'worktrees_dir': '.worktrees'}
-ROLES = ('spec-writer', 'builder', 'observer', 'approver', 'reviewer-code', 'reviewer-security',
+DEFAULTS = {'state_dir': '.factory', 'branch_prefix': 'factory/', 'worktrees_dir': '.worktrees',
+            'skills_off': {}}
+ROLES = ('spec-writer', 'builder', 'observer', 'approver', 'onboarder', 'reviewer-code', 'reviewer-security',
          'reviewer-ux', 'reviewer-ui', 'reviewer-data')
 PROFILE = Path('.factory') / 'profile.md'
 
